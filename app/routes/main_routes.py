@@ -105,10 +105,6 @@ def save_superadminsignature():
 @main_bp.route('/save_signature', methods=['POST'])
 def save_signature():
 
-    allowed_roles = ["SuperAdmin","Admin"]
-    if not "email" in session or not session.get("Role") in allowed_roles:
-        return jsonify({"Error":"Permission Denied"})
-    
     try:
         data = request.get_json()
         signature_data = data.get('signature')
