@@ -38,6 +38,8 @@ def send_mail(title, message, recipients):
         mail.send(msg)
 
 def get_db():
+    import os
+    logging.info("Current directory of functions: {}".format(os.getcwd()))
     app = get_app()
     db = getattr(g, '_database', None)
     if db is None:
