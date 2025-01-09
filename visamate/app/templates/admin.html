@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin paneli</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="static/css/style.css" />
+
+    
+</head>
+
+<body>
+
+    <div class="container">
+
+        {%with%}
+        {% include 'navigator.html' %}
+        {%endwith%}
+
+        <div class="templates">
+            <div id="todo" class="home-todo template-admin">
+    
+                <div class="home-title">
+                    <h1 class="home-heading">
+                        <span>Yapılacak</span>
+                        <br />
+                    </h1>
+
+                </div>
+                <div id="todo-content" class="home-todo-content template-content">
+                    {% for user in users %}
+                    {% for template in json.loads(user[9]) %}
+                    
+                    {%if template.get("templateStatus") == 2 and session["email"] in template.get("incharge") %}
+                    {% with 
+                        template=template,
+                        session=session,
+                        json=json,
+                        t_type=t_type,
+                        form=form,
+                        check_files=check_files,
+                        convert_name=convert_name,
+                        enumerate=enumerate,
+                        str=str,
+                        len=len,
+                        secure_filename=secure_filename,
+                        identifier=identifier
+
+                    %}
+                        {% include 'modal_admin.html' %}
+                    {% endwith %}
+                    {%endif%}
+       
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+                
+            </div>
+            <div id="inprogress" class="home-inprogress template-admin">
+    
+                <div class="home-title">
+                    <h1 class="home-heading">
+                        <span>Yapılıyor</span>
+                        <br />
+                    </h1>
+                </div>
+                <div id="inprogress-content" class="home-inprogress-content template-content">
+                    {% for user in users %}
+                    {% for template in json.loads(user[9]) %}
+                    
+                    {%if template.get("templateStatus") == 0 and session["email"] in template.get("incharge") %}
+                    {% with 
+                        template=template,
+                        session=session,
+                        json=json,
+                        t_type=t_type,
+                        form=form,
+                        check_files=check_files,
+                        convert_name=convert_name,
+                        enumerate=enumerate,
+                        str=str,
+                        len=len,
+                        secure_filename=secure_filename,
+                        identifier=identifier
+
+                    %}
+                        {% include 'modal_admin.html' %}
+                    {% endwith %}
+                    {%endif%}
+
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+                
+            </div>
+            <div id="done" class="home-done template-admin">
+
+                <div class="home-title">
+                    <h1 class="home-heading">
+                        <span>Yapıldı</span>
+                        <br />
+                    </h1>
+                </div>
+                <div id="done-content" class="home-done-content template-content">
+                    {% for user in users %}
+                    {% for template in json.loads(user[9]) %}
+                    {%if template.get("templateStatus") == 1 and session["email"] in template.get("incharge") %}
+                    {% with 
+                        template=template,
+                        session=session,
+                        json=json,
+                        t_type=t_type,
+                        form=form,
+                        check_files=check_files,
+                        convert_name=convert_name,
+                        enumerate=enumerate,
+                        str=str,
+                        len=len,
+                        done=True,
+                        users=users,
+                        contracts= contracts,
+                        identifier=identifier
+
+                    %}
+                        {% include 'modal_admin.html' %}
+                    {% endwith %}
+                    {%endif%}
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="overlay"></div>
+        <script>
+            function changeStatus(tckn, template_id, status) {
+                fetch(`/api/template_status?tckn=${tckn}&template_id=${template_id}&templateStatus=${status}`, {
+                    redirect: 'follow'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    location.reload();
+                })
+                .catch(error => console.error('There was a problem with the fetch operation:', error));
+            }
+
+            const dragItems = document.querySelectorAll(".draggable-item");
+            const dropZones = document.querySelectorAll(".template-admin");
+
+            // Convert dragItems and dropZones NodeList into arrays
+            const dragItemsArray = Array.from(dragItems);
+            const dropZonesArray = Array.from(dropZones);
+
+            let originalDropZoneId = null; // Variable to store the original drop zone ID
+
+            dragItemsArray.forEach(function(dragItem) {
+                dragItem.addEventListener("dragstart", function(event) {
+                    dragItem.classList.add("dragging");
+                    originalDropZoneId = dragItem.closest(".template-admin").id; // Store the ID of the original drop zone
+
+                });
+                dragItem.addEventListener("dragend", function(event) {
+                    dragItem.classList.remove("dragging");
+                    originalDropZoneId = null; // Reset the original drop zone ID
+                });
+            });
+
+            dropZonesArray.forEach(function(dropZone) {
+                dropZone.addEventListener("dragover", function(event) {
+                    event.preventDefault();
+                });
+                dropZone.addEventListener("drop", function(event) {
+                    const draggedItem = document.querySelector(".draggable-item.dragging");
+
+                    dropZone.appendChild(draggedItem);
+                    draggedItem.classList.remove("dragging");
+
+                    var template_id = draggedItem.children[0].getAttribute("data-modal-target").split("-")[1];
+                    var tckn = draggedItem.children[0].getAttribute("data-modal-target").split("-")[0].slice(-4);
+
+                    console.log(draggedItem.children[0].getAttribute("data-modal-target"));
+                    console.log(template_id);
+                    console.log(tckn);
+                    
+                    // Check if the dragged item is dropped in a different drop zone than the original
+                    if (originalDropZoneId !== dropZone.id) {
+                        if (dropZone.id == "todo") {
+                            changeStatus(tckn, template_id, 2);
+                        } else if (dropZone.id == "inprogress") {
+                            changeStatus(tckn, template_id, 0);
+                        } else {
+                            changeStatus(tckn, template_id, 1);
+                        }
+                    }
+                });
+            });
+
+        </script>
+        <script>
+            var preopenedmodal =  document.getElementById("modal{{identifier}}");
+            openModal(preopenedmodal);
+            
+            // Event delegation for opening modal
+            $(document).on("click", '[data-modal-target]', function () {
+                const modal = document.getElementById($(this).data("modalTarget"));
+
+                openModal(modal);
+            });
+
+            // Event delegation for closing modal
+            $('#overlay').on('click', () => {
+                const modals = document.querySelectorAll('.modal.active');
+                modals.forEach(modal => {
+                    closeModal(modal);
+                });
+            });
+
+            // Event delegation for closing modal
+            $(document).on("click", '[data-close-button]', function () {
+                const modal = $(this).closest('.modal')[0];
+                closeModal(modal);
+            });
+
+            // Function to open modal
+            function openModal(modal) {
+                if (modal == null) return;
+                modal.classList.add('active');
+                $('#overlay').addClass('active');
+            }
+            // Function to close modal
+            function closeModal(modal) {
+                if (modal == null) return;
+                modal.classList.remove('active');
+                $('#overlay').removeClass('active');
+            }
+            function handleChange(selectedValue, tckn, template_id) {
+
+                if (selectedValue) {
+
+                    $.ajax('/api/change_templatetype', {
+                        method: 'GET', // or 'GET' depending on your needs
+
+                        data: {
+                            "templateType": selectedValue,
+                            "tckn": tckn,
+                            "template_id": template_id,
+                        },
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            location.reload(true);
+                            // Handle the response as needed
+                            console.log('Request sent successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+            }
+            function editProperties(template_id) {
+                let element = document.getElementById('settings' + template_id);
+                if (element.style.display == "flex") {
+                    element.style.display = "none";
+                } else {
+                    element.style.display = "flex"
+                }
+            }
+        </script>
+        <script>
+            // Add event listeners to the checkboxes
+            const todoFilterCheckbox = document.getElementById('todo-filter');
+            const inprogressFilterCheckbox = document.getElementById('inprogress-filter');
+            const doneFilterCheckbox = document.getElementById('done-filter');
+
+            todoFilterCheckbox.addEventListener('change', () => {
+                const homeTodo = document.querySelector('.home-todo');
+                if (!todoFilterCheckbox.checked) {
+                    homeTodo.style.display = 'none';
+                } else {
+                    homeTodo.style.display = 'flex';
+                }
+            });
+
+            inprogressFilterCheckbox.addEventListener('change', () => {
+                const homeInprogress = document.querySelector('.home-inprogress');
+                if (!inprogressFilterCheckbox.checked) {
+                    homeInprogress.style.display = 'none';
+                } else {
+                    homeInprogress.style.display = 'flex';
+                }
+            });
+            doneFilterCheckbox.addEventListener('change', () => {
+                const homeDone = document.querySelector('.home-done');
+                if (!doneFilterCheckbox.checked) {
+                    homeDone.style.display = 'none';
+                } else {
+                    homeDone.style.display = 'flex';
+                }
+            });
+
+            // Get the search input field
+            const searchInput = document.getElementById('searchInput');
+
+            // Add event listener for input changes
+            searchInput.addEventListener('input', function() {
+                // Get the search query
+                const searchQuery = this.value.trim().toLowerCase();
+
+                // Get the elements to search within
+                const templates = document.querySelectorAll('.templates .draggable-item');
+
+                // Iterate over the elements and hide/show based on search query
+                templates.forEach(template => {
+                    const name = template.querySelector('h4').textContent.toLowerCase();
+                    if (name.includes(searchQuery)) {
+                        template.style.display = 'block'; // Show the element
+                    } else {
+                        template.style.display = 'none'; // Hide the element
+                    }
+                });
+            });
+
+        </script>
+   
+    </div>
+</body>
+
+</html>
+
+

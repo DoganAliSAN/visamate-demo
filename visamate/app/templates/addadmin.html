@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/css/style.css" />
+    <title>Gerekli Dosyalar</title>
+</head>
+<body>
+    <body>
+
+        <div class="container">
+            {%with%}
+            {% include 'navigator.html' %}
+            {%endwith%}
+    
+            <div class="add-filename">
+                <div class="title">
+                    <h1>Admin Üye Ekle</h1>
+                </div>
+                <form action="/addadmin" method="post">
+                    <input type="text" class="addfileinput" name="tckn" placeholder="Tc Kimlik Numarası">
+
+                    <button type="submit" class="update-button button button-primary button-lg">Ekle</button>
+                </form>
+                {%if success==True%}
+                <div class="success">
+                    <h3>Başarılı</h3>
+                </div>
+                {%endif%}
+            </div>
+        </div>
+    </body>
+</body>
+</html>

@@ -1,0 +1,410 @@
+{% set contract = template.get('contract') %}
+{% set template_id = template.get('template_id') %}
+{% set tckn = user[2] %}
+{% set surname = user[1] %}
+{% set username = user[0] %}
+{% set templateType = template.get("templateType") %}
+{% set identifier = str(surname)+str(tckn[-4:])+str(template_id) %}
+{% set identifier_modal = str(surname)+str(tckn[-4:])+"-"+str(template_id) %}
+
+<div class='draggable-item' id="draggable{{identifier}}"  draggable='true'>
+    <div style="width:100%;height:100%" data-modal-target="modal{{identifier_modal}}">
+        <h4 id='display_name' class='home-text02'>
+            <span>{{username}} {{surname}}  {{templateType}}</span>
+            <br />
+        </h4>
+    </div>
+    <svg viewBox='0 0 1024 1024' class='editproperties'
+        onclick="editProperties('{{identifier}}')">
+
+        <path
+            d='M864 0c88.364 0 160 71.634 160 160 0 36.020-11.91 69.258-32 96l-64 64-224-224 64-64c26.742-20.090 59.978-32 96-32zM64 736l-64 288 288-64 592-592-224-224-592 592zM715.578 363.578l-448 448-55.156-55.156 448-448 55.156 55.156z'>
+        </path>
+    </svg>
+
+    <div class="settings" id="settings{{identifier}}"
+        style="display:none;flex-direction:column">
+
+        <select id="templateType" name="type"
+            onchange="handleChange(this.value,'{{tckn}}',{{template_id}})">
+            <option value="">Tür Düzenle</option>
+            <option value="81A">81A</option>
+            <option value="MAVIKART">MAVIKART</option>
+            <option value="AUSBILDUNG">AUSBILDUNG</option>
+            <option value="SCHENGEN">SCHENGEN</option>
+        </select>
+        <a href="/api/remove_template?tckn={{tckn}}&template_id={{template_id}}&identifier={{identifier_modal}}"
+            style="color:red;" onclick="return confirm('Silmek istediğinizden emin misiniz?')">Sil</a>
+
+    </div>
+</div>
+
+<div class="modal" id="modal{{identifier_modal}}">
+    <div class="customertemplate-container">
+        <div id="customer" class="customertemplate-customer">
+            <!-- Header -->
+            <div class="modal-header"
+                style="width:100%;display:flex;justify-content:space-between;margin-bottom:16px">
+                <h1 id="customer-name">{{username}} {{surname}} {{templateType}}
+                </h1>
+                <div class="close-side">
+                    <!-- Contract Send for SuperAdmin -->
+                    <div class="statusbar">
+
+                        <div class="counts" id="file_count">
+                            <strong class="percentagetext" id="filepercentagetext{{identifier}}">0</strong>
+                            <div class="movingstatusbar" id="filemovingstatusbar{{identifier}}">
+                            </div>
+                        </div>
+                        <div class="colors">
+                            <div class="color-box" style="background-color: var(--dl-first-color);"></div>
+                            <div class="color-box" style="background-color: var(--dl-second-color);"></div>
+                            <div class="color-box" style="background-color: var(--dl-third-color);"></div>
+                            <div class="color-box" style="background-color: var(--dl-fourth-color);"></div>
+                            <div class="color-box" style="background-color: var(--dl-fifth-color);"></div>
+                        </div>
+                    </div>
+                    <button data-close-button class="close-button">&times;</button>
+                </div>
+            </div>
+            <!-- SuperAdmin -->
+            {% if done %}
+            {% if template.get("superadmin_sign") == 1 %}
+                <h4 style="color:var(--dl-repeating-color);">Süper admin Sözleşmeyi İmzaladı</h4>
+            {%else%}
+                <div class="contract-sent">
+                    {% if len(template.get("superadmin")) != 0 %}
+                    <h4>Süper Admine <span style="color:red;">Gönderildi</span></h4>
+                    {%else%}
+                    <h4>Süper Admine gönder</h4>
+                    {%endif%}
+                    <form method="POST" action="/api/superadmin_contract?tckn={{tckn}}&template_id={{template_id}}&identifier={{identifier_modal}}" enctype="multipart/form-data">
+
+                        <select name="contract" id="contracts">
+                            {%for contract in contracts%}
+                            <option  value="{{contract[0]}}">{{contract[1]}}</option>
+                            {%endfor%}
+
+                        </select>
+                        <select name="superadmin" id="selectsuperadmin">
+                            {%for user in users%}
+                            {%if user[7] == "SuperAdmin"%}
+                            <option value="{{user[3]}}">{{user[3]}}</option>
+                            {%endif%}
+                            {%endfor%}
+                        </select>
+
+                        <button class="update-button button">Dosyayı Gönder</button>
+                    </form>
+                </div>
+            {%endif%}
+            {% endif %}
+            <!-- Staff -->
+            <div class="included-staff">
+                <div class="included-header">
+                    <h3>Personel</h3>
+                    <form method="POST" action="/api/update_staff?tckn={{tckn}}&template_id={{template_id}}&identifier={{identifier_modal}}" class="add-staff">
+                        <input type="text" class="staff-input" id="staff-input" name="staff_mail"
+                            placeholder="Personel Emaili">
+                        <button class="update-button button button-primary button-lg" id="update-button"
+                            type="submit">Ekle</button>
+                    </form>
+                </div>
+                <div class="staff-mails">
+                    {%for incharge in template.get("incharge")%}
+                    <span>{{incharge}} <a href="/api/delete_staff?tckn={{tckn}}&template_id={{template_id}}&staff_mail={{incharge}}&identifier={{identifier_modal}}" style="color:red;">Sil</a></span>
+                    {%endfor%}
+
+                </div>
+            </div>
+            <!-- Description -->
+            <div class="template_description">
+                <h3>Açıklama</h3>
+
+                <h3>{{template.get("description")}}</h3>
+            </div>
+            <!-- Contract -->
+            <div class="user_contract">
+                {%if template.get("contractSigned") != 1%}
+                <h3>Sözleşmeler <span style="color:red;">Eksik Sözleşmeler var</span></h3>
+                
+                {%for cont in template.get("contract")%}
+                {%if cont['signed'] == 0%} 
+                <label style="color:red;">{{cont['contract'].split("/")[-1]}}</label>
+                {%else%}
+                <div style="display:flex;justify-content: space-between;">
+                    <label>{{cont['contract'].split("/")[-1]}}</label>
+                    <a href="/download/customer_contracts/contract{{cont['contract'].split("/")[-1].split(".")[0]}}{{ secure_filename(identifier) }}.pdf" style="color: var(--dl-repeating-color)">Sözleşme İndir</a>
+                    <a href="/api/remove_contract?template_id={{template_id}}&tckn={{tckn}}&contract={{cont}}&identifier={{identifier_modal}}" style="color: red;">Sil</a>
+                </div>
+                    
+                {%endif%}
+                {%endfor%}
+                {%else%}
+                <h3>Sözleşmeler</h3>
+                {%for cont in template.get("contract")%}
+                <div style="display:flex;justify-content: space-between;">
+                    <label style="width:30%;">{{cont['contract'].split("/")[-1]}}</label>
+                    <a href="/download/customer_contracts/contract{{cont['contract'].split("/")[-1].split(".")[0]}}{{ secure_filename(identifier) }}.pdf" style="color: var(--dl-repeating-color)">Sözleşme İndir</a>
+                    <a href="/api/remove_contract?template_id={{template_id}}&tckn={{tckn}}&contract={{cont}}&identifier={{identifier_modal}}" style="color: red;">Sil</a>
+                </div>
+                {%endfor%}
+                {%endif%}
+            </div>
+            <!-- Files -->
+            <div class="file-input-container" id="customer-files">
+                <span style="color:yellow">Dosyaları aşağıdaki şekilde isimlendirerek yükleyiniz:</span>
+                <!-- File count declare  -->
+                <script>
+                
+                    let count_left_file{{identifier}} = 0;
+                    //$(`#file_count`).text(count_left_file{{identifier}}+"/{{ len(t_type(templateType))}}");
+
+                    
+                </script>
+                {% for count,name in enumerate(t_type(templateType)) %}
+
+                {% if
+                len(check_files(tckn,template_id,convert_name(name,tckn)))
+                != 0 %}
+                <!-- File count update  -->
+                <script>
+                    count_left_file{{identifier}} ++;
+                    //$(`#file_count`).text(count_left_file{{identifier}}+"/{{ len(t_type(templateType))}}");
+                    var percentage = Math.round((count_left_file{{identifier}}  * 100 ) / {{ len(t_type(templateType))}});
+                    var dgitem = document.getElementById("draggable{{identifier}}");
+                    var movingbar = document.getElementById("filemovingstatusbar{{identifier}}");
+                    console.log(movingbar);
+                    
+                    /* define percentage ranges */
+                    if(percentage == 100){
+                        dgitem.style.backgroundColor = "var(--dl-fifth-color)";
+                        movingbar.style.backgroundColor = "var(--dl-fifth-color)";
+                        movingbar.style.width = percentage + "%";
+                        $("#filepercentagetext{{identifier}}").text("");
+                        $("#filepercentagetext{{identifier}}").text(percentage);
+
+
+                    }else if(75 < percentage & percentage <= 100){
+                        dgitem.style.backgroundColor = "var(--dl-fourth-color)";
+                        movingbar.style.backgroundColor = "var(--dl-fourth-color)";
+                        movingbar.style.width = percentage + "%";
+                        $("#filepercentagetext{{identifier}}").text("");
+                        $("#filepercentagetext{{identifier}}").text(percentage);
+
+                    }else if (50 <percentage & percentage <= 75){
+                        dgitem.style.backgroundColor = "var(--dl-third-color)";
+                        movingbar.style.backgroundColor = "var(--dl-third-color)";
+                        movingbar.style.width = percentage + "%";
+                        $("#filepercentagetext{{identifier}}").text("");
+                        $("#filepercentagetext{{identifier}}").text(percentage);
+
+                    }else if (25 < percentage & percentage <= 50){
+                        dgitem.style.backgroundColor = "var(--dl-second-color)";
+                        movingbar.style.backgroundColor = "var(--dl-second-color)";
+                        movingbar.style.width = percentage + "%";
+                        $("#filepercentagetext{{identifier}}").text("");
+                        $("#filepercentagetext{{identifier}}").text(percentage);
+                    }else if (0 < percentage & percentage <= 25){
+                        dgitem.style.backgroundColor = "var(--dl-first-color)";
+                        movingbar.style.backgroundColor = "var(--dl-first-color)";
+                        movingbar.style.width = percentage + "%";
+                        $("#filepercentagetext{{identifier}}").text("");
+                        $("#filepercentagetext{{identifier}}").text(percentage);
+
+                    }
+                </script>
+                <!-- File delete/download  -->
+                <div class="file-group">
+                    <label class="custom-file-input" id="file-label{{count}}">{{name}}: Yüklendi
+                        <a href="/api/delete_file?tckn={{tckn}}&template_id={{template_id}}&file_path={{'app/static/files/' + convert_name(name,tckn)}}&identifier={{identifier_modal}}"
+                            style="color: red;" onclick="return confirm('Silmek istediğinizden emin misiniz?')" >Sil</a>
+                        <a href="/download/files/{{convert_name(name,tckn)}}.pdf"
+                            style="color: var(--dl-repeating-color);">Download File</a>
+
+                    </label>
+                </div>
+                {% else %}
+                <!-- File Upload -->
+                <form method="POST"
+                    action="/api/update_files?tckn={{tckn}}&templateType={{templateType}}&template_id={{template_id}}&name={{convert_name(name,tckn)}}&identifier={{identifier_modal}}"
+                    enctype="multipart/form-data">
+                    <div class="file-group">
+                        {{ form.csrf_token }}
+                        {{ form.file(class="file-input",id="file-input-" + identifier + str(count) )}}
+
+                        <label
+                            for="file-input-{{identifier + str(count)}}"
+                            class="custom-file-input" id='file-label-{{identifier+str(count)}}'>{{name}}  <span style="color:var(--dl-repeating-color)">{{convert_name(name,tckn).lower().split("_")[0]}}</span></label>
+                        <script>
+                            $('#file-input-{{identifier + str(count)}}').change(function () {
+                                filename = this.files[0].name;
+                                $('#file-label-{{identifier + str(count)}}').text(filename);
+
+                            });
+                        </script>
+
+                        {{form.submit_button(class="update-button button button-primary button-lg")}}
+                    </div>
+                </form>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <!-- Add Task -->
+            <form class="task-form" id="add-task"
+                action="/api/add_task?template_id={{template_id}}&user_id={{tckn}}&identifier={{identifier_modal}}&identifier={{identifier_modal}}"
+                method="post">
+                <div class="task-form-div">
+                    <div class="task-form-inputs">
+                        <textarea class="task-form-textarea" id="task-title" name="task-content" placeholder="Görev Ekleyin"></textarea>
+                        <input type="checkbox" name="visibleToCustomer" id="visibleToCustomer" >
+                        <label for="visibleToCustomer">Muşteriye Görünürlük </label>
+                        <input type="date" name="taskDate" id="taskDate" class="taskDate" required>
+
+                    </div>
+                    <button class="update-button button button-primary button-lg" id="update-button"
+                        type="submit">Ekle</button>
+                    
+                </div>
+            </form>
+            <!-- Tasks -->
+            <form class="customer-form" id="customer-form"
+                action="/api/update_task?template_id={{template_id}}&user_id={{tckn}}&identifier={{identifier_modal}}"
+                method="post">
+                <div class="input-group">
+                    <div class="input-group-header">
+                        <h3>Yapılacaklar</h3>
+                        <div class="statusbar">
+
+                            <div class="counts" id="task_count">
+                                <div class="movingstatusbar" id="taskmovingstatusbar{{identifier}}">
+                                    <strong class="percentagetext" id="taskpercentagetext{{identifier}}">0</strong>
+                                </div>
+                            </div>
+                            <div class="colors">
+                                <div class="color-box" style="background-color: var(--dl-first-color);"></div>
+                                <div class="color-box" style="background-color: var(--dl-second-color);"></div>
+                                <div class="color-box" style="background-color: var(--dl-third-color);"></div>
+                                <div class="color-box" style="background-color: var(--dl-fourth-color);"></div>
+                                <div class="color-box" style="background-color: var(--dl-fifth-color);"></div>
+                            </div>
+                        </div>
+                        <button class="update-button button button-primary button-lg" id="update-button" type="submit">Update</button>
+                    </div>
+
+                    {% for count_time,task in enumerate(template.get("tasks")) %}         
+                    {% set len_tasks = len(template.get("tasks"))%}
+                    {% set len_completed = template.get("tasks") | selectattr("status", "equalto", 1) | list | length %}
+
+                    <div class='task' style="padding:10px;">
+                        {%if task["status"] == 1 %}
+
+                        <script>
+                            var taskpercentage = Math.round(({{len_completed}} * 100)  / {{len_tasks}}); 
+                            var movingbartask = document.getElementById("taskmovingstatusbar{{identifier}}");
+                            /* define taskpercentage ranges */
+                            if(taskpercentage == 100){
+                                movingbartask.style.backgroundColor = "var(--dl-fifth-color)";
+                                movingbartask.style.width = taskpercentage + "%";
+                                $("#taskpercentagetext{{identifier}}").text("");
+                                $("#taskpercentagetext{{identifier}}").text(taskpercentage);
+
+
+                            }else if(75 < taskpercentage & taskpercentage <= 100){
+                                movingbartask.style.backgroundColor = "var(--dl-fourth-color)";
+                                movingbartask.style.width = taskpercentage + "%";
+                                $("#taskpercentagetext{{identifier}}").text("");
+                                $("#taskpercentagetext{{identifier}}").text(taskpercentage);
+
+                            }else if (50 <taskpercentage & taskpercentage <= 75){
+                                movingbartask.style.backgroundColor = "var(--dl-third-color)";
+                                movingbartask.style.width = taskpercentage + "%";
+                                $("#taskpercentagetext{{identifier}}").text("");
+                                $("#taskpercentagetext{{identifier}}").text(taskpercentage);
+
+                            }else if (25 < taskpercentage & taskpercentage <= 50){
+                                movingbartask.style.backgroundColor = "var(--dl-second-color)";
+                                movingbartask.style.width = taskpercentage + "%";
+                                $("#taskpercentagetext{{identifier}}").text("");
+                                $("#taskpercentagetext{{identifier}}").text(taskpercentage);
+                            }else if (0 < taskpercentage & taskpercentage <= 25){
+                                movingbartask.style.backgroundColor = "var(--dl-first-color)";
+                                movingbartask.style.width = taskpercentage + "%";
+                                $("#taskpercentagetext{{identifier}}").text("");
+                                $("#taskpercentagetext{{identifier}}").text(taskpercentage);
+
+                            }
+                        </script>
+                        <div class="task-inputs">
+                            <input name='task-{{task["taskId"]}}' id='task-{{task["taskId"]}}'
+                                type='checkbox' checked />
+                            <label for='task-{{task["taskId"]}}'>{{task["task"]}}</label>
+                        </div>
+                        <div class="dateoftask">
+                            <a href="/api/delete_task?tckn={{tckn}}&template_id={{template_id}}&taskId={{task['taskId']}}&identifier={{identifier_modal}}"
+                                style="color: red;" onclick="return confirm('Silmek istediğinizden emin misiniz?')" >Sil</a>
+                            {{task["taskDate"]}}
+                        </div>
+                        {%else%}
+                        <div class="task-inputs">
+                            <input name='task-{{task["taskId"]}}' id='task-{{task["taskId"]}}'
+                                type='checkbox' />
+                            <label for='task-{{task["taskId"]}}'>{{task["task"]}}</label>
+                        </div>
+                        <div class="dateoftask">
+                            <a href="/api/delete_task?tckn={{tckn}}&template_id={{template_id}}&taskId={{task['taskId']}}&identifier={{identifier_modal}}"
+                                style="color: red;" onclick="return confirm('Silmek istediğinizden emin misiniz?')" >Sil</a>
+                            <script>
+                                var myDate{{count_time}} = new Date();
+                                myDate{{count_time}}.setSeconds(0);
+                                myDate{{count_time}}.setMinutes(0);
+                                myDate{{count_time}}.setHours(0);
+                                var taskDate{{count_time}} = new Date('{{task["taskDate"]}}');
+
+                                if(myDate{{count_time}} > taskDate{{count_time}}){
+                                    var task = document.getElementsByClassName('task-div-{{task["taskId"]}}');
+                                    task[0].style.backgroundColor = "red";
+                                    task[0].style.padding = "10px";
+                                    var input  = document.getElementById('task-{{task["taskId"]}}');
+                                    input.remove();
+                                }
+                            </script>
+                            {{task["taskDate"]}}
+                        </div>
+                        {%endif%}
+                    </div>
+                    {%endfor%}
+
+                </div>
+
+            </form>
+            <!-- Admin comments -->
+            <div class="comments-container">
+                <div class="comments-header">
+                    <h3>Yorumlar</h3>
+                </div>
+                <form action="/api/add_comment?tckn={{tckn}}&template_id={{template_id}}&identifier={{identifier_modal}}" class="comment-form" method="POST">
+                    <div class="comment-input">
+                        <input type="text" class="comment" name="comment" placeholder="Yorum yazın">
+                        <button class="update-button button button-primary button-lg" id="update-button"
+                        type="submit">Gönder</button>
+                    </div>
+                </form>
+                <div class="comments-field">
+                    {%for comment in template.get("comments")%}
+                    <div class="comment-container">
+                        <div class="staff-info">
+                            <span>{{comment.get("id")}}:</span>
+                        </div>
+                        <div class="comment-field">
+                            <span>{{comment.get("comment")}}</span>
+                        </div>
+
+                    </div>
+                    {%endfor%}
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>

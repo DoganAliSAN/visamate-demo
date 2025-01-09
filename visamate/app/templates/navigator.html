@@ -1,0 +1,59 @@
+<nav class="navigator">
+    <div class="navigator-logo">
+    </div>
+    <div class="navigator-links">
+        <a class="nav-button" href="/admin">Admin Paneli</a>
+        <a class="nav-button" href="/">Müşteri Paneli</a>
+        <a class="nav-button" href="/addadmin">Admin Ekle</a>
+
+
+        <a class="nav-button" href="/addtemplate">Müşteri Dosyası Ekle</a>
+        <a class="nav-button save_contract" href="/save_contract">Sözleşme Ekle</a>
+        <a class="nav-button" href="/filenames">Gerekli Dosya Ekle</a>
+        <a class="nav-button" href="/pretasks">Ayarlanmış Görev Ekle </a>
+        <div class="nav-button">
+            <form action="" class="filter">
+                <input type="checkbox" name="todo-filter" id="todo-filter" checked>
+                <label for="todo-filter">
+                    Yapılacak
+                </label>
+                <input type="checkbox" name="inprogress-filter" id="inprogress-filter" checked>
+                <label for="inprogress-filter">
+                    Yapılıyor
+                </label>
+                <input type="checkbox" name="done-filter" id="done-filter" checked>
+                <label for="done-filter">
+                    Yapıldı
+                </label>
+            </form>
+        </div>
+        <input type="text" class="searchbar nav-button" id="searchInput" placeholder="Search...">
+        <a class="nav-button" href="/logout">Çıkış Yap</a>
+        <div class="nav-button colors">
+            <div class="nav-colors">
+                <div>
+                    <div class="color-box" style="background-color: var(--dl-first-color);"></div>
+                    <span>0 - 25%</span>
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: var(--dl-second-color);"></div>
+                    <span>25% - 50%</span>
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: var(--dl-third-color);"></div>
+                    <span>50% - 75%</span>
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: var(--dl-fourth-color);"></div>
+                    <span>75% - 100%</span>                    
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: var(--dl-fifth-color);"></div>
+                    <span>100%</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</nav>
