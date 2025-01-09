@@ -4,9 +4,9 @@ from .routes.admin_routes import admin_bp
 from .routes.customer_routes import customer_bp
 from flask import Flask
 from functions import get_app
+app = get_app()
 
 def create_app():
-    app = get_app()
 
 
     ROLES = {
