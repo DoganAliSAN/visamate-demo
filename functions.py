@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from unidecode import unidecode
 
 import bcrypt,sqlite3,time,os,json
-
+import logging
 def get_app():
 
 
@@ -38,7 +38,7 @@ def send_mail(title, message, recipients):
         mail.send(msg)
 
 def get_db():
-    import os
+    logging.basicConfig(filename='/home/BerkeErtep/mysite/myapp.log', level=logging.INFO)
     logging.info("Current directory of functions: {}".format(os.getcwd()))
     app = get_app()
     db = getattr(g, '_database', None)
