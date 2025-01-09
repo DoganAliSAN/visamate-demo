@@ -473,8 +473,8 @@ def template_status():
             else:
                 template["templateStatus"] = int(template_status)
 
-            msg= open(f"{current_app.config['CWD']}/app/static/email_msg/msg.html","r").read().format(email=session["email"],status=template["templateStatus"],type=template["templateType"],incharge=template["incharge"],template_id=template_id,tckn=tckn,template=template)
-            send_mail(title="Template Durumu değiştirildi",message=msg,recipients=["sandoganali187@gmail.com"])
+            # msg= open(f"{current_app.config['CWD']}/app/static/email_msg/msg.html","r").read().format(email=session["email"],status=template["templateStatus"],type=template["templateType"],incharge=template["incharge"],template_id=template_id,tckn=tckn,template=template)
+            # send_mail(title="Template Durumu değiştirildi",message=msg,recipients=["sandoganali187@gmail.com"])
         new_templates.append(template)
     if len(tckn) == 4 :
 
