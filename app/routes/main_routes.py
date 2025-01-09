@@ -12,6 +12,7 @@ import json
 import os
 import tempfile
 import traceback
+import logging
 
 parser = argparse.ArgumentParser(description="DALİŞ")
 
@@ -102,6 +103,8 @@ def save_superadminsignature():
         return jsonify({'error': str(e)}), 500
 @main_bp.route('/save_signature', methods=['POST'])
 def save_signature():
+    logging.basicConfig(filename='/home/BerkeErtep/mysite/myapp.log', level=logging.INFO)
+
     allowed_roles = ["SuperAdmin","Admin"]
     if not "email" in session or not session.get("Role") in allowed_roles:
         return jsonify({"Error":"Permission Denied"})
@@ -111,7 +114,7 @@ def save_signature():
         signature_data = data.get('signature')
         filename = f"app/static/files/signature{secure_filename(data.get('filename'))}.png"
         contract = data.get('contract')
-        print(contract)
+        logging.info("Contract: {}".format(contract))
         tckn = data.get('tckn')
         conn = get_db()
         cursor = conn.cursor()
@@ -133,28 +136,43 @@ def save_signature():
         # change contractSigned status on database
         cursor.execute("SELECT templates FROM Users WHERE tckn = ?", (tckn,))
         templates = cursor.fetchone()
-        templates = json.loads(templates[0])
+
+        # Ensure that templates is a list, not None
+        if templates:
+            templates = json.loads(templates[0])
+        else:
+            templates = []  # In case the templates field is empty
+
         template_id = data.get('template_id')
         new_templates = []
+
+        # Process templates and update contract status
         for template in templates:
             if template.get("template_id") == int(template_id):
-
                 new_contracts = []
+
                 for cont in template.get("contract"):
                     if cont.get("contract") == contract:
                         cont["signed"] = 1
-                        new_contracts.append(cont)
-                    else:
-                        new_contracts.append(cont)
+                    new_contracts.append(cont)
+
                 count = len([x for x in new_contracts if x['signed'] == 1])
 
                 if count == len(template.get("contract")):
                     template["contractSigned"] = 1
-                template['contract'] = new_contracts
-                new_templates.append(template)
-            else:
-                new_templates.append(template)
 
+                template['contract'] = new_contracts
+                new_templates.append(template)  # Add the updated template to new_templates
+            else:
+                new_templates.append(template)  # Keep unchanged templates as they are
+
+        # Update the templates field with new templates
+        templates = new_templates  # Assign new_templates back to templates
+
+        # Log the updated templates
+        logging.info("Templates after signature update {}".format(templates))
+
+        # Update the database with the modified templates
         cursor.execute("UPDATE Users SET templates = ? WHERE tckn = ?", (json.dumps(templates), tckn))
         conn.commit()
         conn.close()
