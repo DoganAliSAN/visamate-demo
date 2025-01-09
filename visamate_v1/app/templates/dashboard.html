@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visamate</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+    <div class="user">Welcome {{session["username"]}} {{session["surname"]}}! <a href="/logout">Logout</a></div>
+    <div id="tasked-users">
+    </div>
+    <script>
+$.ajax({
+    url: '/tasked_users',
+    type: 'GET',
+    success: function(usersData) {
+        // Clear existing content in the #tasked-users div
+        $('#tasked-users').empty();
+
+        // Iterate over each user
+        usersData.Users.forEach(function(user) {
+            // Make AJAX request to fetch tasks for the current user
+            $.ajax({
+                url: '/customer_tasks/' + user,
+                type: 'GET',
+                success: function(tasksData) {
+                    console.log(tasksData)
+                    // Append tasks to #tasked-users
+                    tasksData.forEach(function(task) {
+                        $('#tasked-users').append('<div class="task">' + task + '</div>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    },
+    error: function(xhr, status, error) {
+        console.error(error);
+    }
+});
+
+    </script>
+</body>
+</html>

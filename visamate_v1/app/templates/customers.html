@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks</title>
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Task Id</th>
+            <th>Task Owner</th>
+            <th>Task</th>
+            <th>Status</th>
+        </tr>
+        {%for task in tasks%}
+            <tr>
+                    <td>{{task[0]}}</td>
+                    <td>{{task[1]}}</td>
+                    <td>{{task[2]}}</td>
+                    <td>{{task[3]}}</td>
+            </tr>
+        {%endfor%}
+    </table>
+</body>
+</html>
