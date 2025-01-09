@@ -65,10 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function drawRectangle() {
     overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-    let scaledStartX = startX / scale_two;
-    let scaledStartY = startY / scale_two;
-    let scaledEndX = endX / scale_two;
-    let scaledEndY = endY / scale_two;
+    // Adjust coordinates based on dynamic scaling factor
+    let scaledStartX = startX * scale_two;
+    let scaledStartY = startY * scale_two;
+    let scaledEndX = endX * scale_two;
+    let scaledEndY = endY * scale_two;
 
     overlayCtx.beginPath();
     overlayCtx.rect(
@@ -83,15 +84,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Mouse event listeners for rectangle drawing
   overlayCanvas.addEventListener("mousedown", (e) => {
-    startX = e.offsetX;
-    startY = e.offsetY;
+    startX = e.offsetX / scale_two; // Adjust based on scale
+    startY = e.offsetY / scale_two;
     isDragging = true;
   });
 
   overlayCanvas.addEventListener("mousemove", (e) => {
     if (isDragging) {
-      endX = e.offsetX;
-      endY = e.offsetY;
+      endX = e.offsetX / scale_two; // Adjust based on scale
+      endY = e.offsetY / scale_two;
       drawRectangle();
     }
   });
@@ -101,10 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     isDragging = false;
 
-    let scaledStartX = startX / scale_two;
-    let scaledStartY = startY / scale_two;
-    let scaledEndX = endX / scale_two;
-    let scaledEndY = endY / scale_two;
+    let scaledStartX = startX;
+    let scaledStartY = startY;
+    let scaledEndX = endX;
+    let scaledEndY = endY;
     let width = scaledEndX - scaledStartX;
     let height = scaledEndY - scaledStartY;
 
