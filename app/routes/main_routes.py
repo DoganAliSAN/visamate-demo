@@ -178,7 +178,8 @@ def save_signature():
         conn.close()
         return jsonify({'message': 'Signature saved successfully'}), 200
     except Exception as e:
-        traceback.print_exc()
+        
+        logging.error(traceback.print_exc())
         return jsonify({'error': str(e)}), 500
 
 
