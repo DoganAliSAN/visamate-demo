@@ -116,6 +116,7 @@ def save_signature():
         contract = data.get('contract')
         logging.info("Contract: {}".format(contract))
         tckn = data.get('tckn')
+        logging.info("TCKN: {}".format(tckn))
         conn = get_db()
         cursor = conn.cursor()
         #contractPath contractName startX startY width height
@@ -133,6 +134,7 @@ def save_signature():
             coords=f"{page_num}x{startX}x{pdfHeight-height -startY}x{width}x{height}"
         )
         result = sign_pdf(args)
+        logging.info("signed contract file saved")
         # change contractSigned status on database
         cursor.execute("SELECT templates FROM Users WHERE tckn = ?", (tckn,))
         templates = cursor.fetchone()
@@ -179,7 +181,7 @@ def save_signature():
         return jsonify({'message': 'Signature saved successfully'}), 200
     except Exception as e:
         
-        logging.error(traceback.print_exc())
+        logging.info(traceback.print_exc())
         return jsonify({'error': str(e)}), 500
 
 
