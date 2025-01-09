@@ -15,6 +15,7 @@ import traceback
 import logging
 
 parser = argparse.ArgumentParser(description="DALİŞ")
+logging.basicConfig(filename='/home/BerkeErtep/mysite/myapp.log', level=logging.INFO)
 
 main_bp = Blueprint('main', __name__)
 
@@ -103,7 +104,6 @@ def save_superadminsignature():
         return jsonify({'error': str(e)}), 500
 @main_bp.route('/save_signature', methods=['POST'])
 def save_signature():
-    logging.basicConfig(filename='/home/BerkeErtep/mysite/myapp.log', level=logging.INFO)
 
     allowed_roles = ["SuperAdmin","Admin"]
     if not "email" in session or not session.get("Role") in allowed_roles:
