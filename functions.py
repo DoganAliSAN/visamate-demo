@@ -157,7 +157,7 @@ def template_tasks(t_type):
     return tasknames
 class UploadFileForm(FlaskForm):
     file = FileField("file",validators=[InputRequired(),  FileAllowed(['pdf', 'doc', 'docx'], message='Only PDF files allowed.')])
-    submit_button = SubmitField("Upload File")
+    submit_button = SubmitField("Dosyayı Yükle")
 def get_file_names_without_extensions(file_path,folder_path):
     file_names_without_extensions = []
     for file_name in os.listdir(folder_path):
