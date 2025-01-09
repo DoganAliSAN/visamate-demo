@@ -17,7 +17,7 @@ def get_app():
     app = Flask(__name__,template_folder='app/templates',static_folder='app/static')
     app.secret_key = "!g2q_q*p#!6j)nmdnb170&)y4i54!l2)ji&w7u%e16i5n^2)" 
     app.config["CWD"] = "/home/BerkeErtep/mysite"
-    app.config['DATABASE'] = f'{app.config["CWD"]}/app/main.db'
+    app.config['DATABASE'] = f"{app.config['CWD']}/app/main.db"
     app.config['UPLOAD_FOLDER'] = 'static/files'
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
