@@ -3,7 +3,6 @@ from flask import Blueprint,session,render_template,redirect,url_for,request,jso
 from functions import all_users,t_types,get_db,UploadFileForm,get_file_names_without_extensions,get_users,check_files,convert_name,send_mail,get_templates,update_templates,template_tasks
 from werkzeug.utils import secure_filename
 import datetime 
-
 import json
 import os
 
@@ -336,7 +335,7 @@ def update_files():
         if keyword not in file.filename.lower():
             return redirect(url_for("admin.admin",identifier=request.args.get("identifier")))
         file_name = f"{name}.{file.content_type.split('/')[1]}"
-        file_path = f"{app.config['CWD']}/app/static/files/"+ secure_filename(file_name)
+        file_path = f"{admin_bp.config['CWD']}/app/static/files/"+ secure_filename(file_name)
 
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../static/files",secure_filename(file_name)))
     else:
@@ -473,7 +472,7 @@ def template_status():
             else:
                 template["templateStatus"] = int(template_status)
 
-            msg= open(f"{app.config['CWD']}/app/static/email_msg/msg.html","r").read().format(email=session["email"],status=template["templateStatus"],type=template["templateType"],incharge=template["incharge"],template_id=template_id,tckn=tckn,template=template)
+            msg= open(f"{admin_bp.config['CWD']}/app/static/email_msg/msg.html","r").read().format(email=session["email"],status=template["templateStatus"],type=template["templateType"],incharge=template["incharge"],template_id=template_id,tckn=tckn,template=template)
             send_mail(title="Template Durumu değiştirildi",message=msg,recipients=["sandoganali187@gmail.com"])
         new_templates.append(template)
     if len(tckn) == 4 :
