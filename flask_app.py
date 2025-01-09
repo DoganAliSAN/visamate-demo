@@ -7,10 +7,5 @@
 #Good Luck future me.
 
 from app import create_app
-import logging
-logging.basicConfig(filename='myapp.log', level=logging.INFO)
-logging.info('Started')
 
 app = create_app()
-
-logging.info("App configs: {}".format(app.config))
