@@ -1,6 +1,6 @@
 from argparse import Namespace
 from html import unescape
-from flask import Blueprint,session,render_template,redirect,url_for,request,jsonify, send_from_directory
+from flask import Blueprint,session,render_template,redirect,url_for,request,jsonify, send_from_directory,current_app
 from functions import get_db,UploadFileForm,get_file_names_without_extensions,get_app,t_types,get_users,check_files,convert_name
 from signature import sign_pdf
 from unidecode import unidecode
@@ -59,7 +59,7 @@ def save_superadminsignature():
     try:
         data = request.get_json()
         signature_data = data.get('signature')
-        filename = f"{main_bp.config['CWD']}/app/static/files/signature{secure_filename(data.get('filename'))}.png"
+        filename = f"{current_app.config['CWD']}/app/static/files/signature{secure_filename(data.get('filename'))}.png"
         contract = data.get('contract')
         tckn = data.get('tckn')
         conn = get_db()
@@ -75,7 +75,7 @@ def save_superadminsignature():
             pdf=contract,
             signature=filename,
             date=False,
-            output =f"{main_bp.config['CWD']}/app/static/superadmin_contracts/contract{secure_filename(data.get('filename') + data.get('mail'))}.pdf",
+            output =f"{current_app.config['CWD']}/app/static/superadmin_contracts/contract{secure_filename(data.get('filename') + data.get('mail'))}.pdf",
             coords=f"{page_num}x{startX}x{pdfHeight-height -startY}x{width}x{height}"
         )
         result = sign_pdf(args)
@@ -126,7 +126,7 @@ def save_signature():
             pdf=contract,
             signature=filename,
             date=False,
-            output =f"{main_bp.config['CWD']}/app/static/customer_contracts/contract{contract.split('/')[-1].split('.')[0]}{secure_filename(data.get('filename'))}.pdf",
+            output =f"{current_app.config['CWD']}/app/static/customer_contracts/contract{contract.split('/')[-1].split('.')[0]}{secure_filename(data.get('filename'))}.pdf",
             coords=f"{page_num}x{startX}x{pdfHeight-height -startY}x{width}x{height}"
         )
         result = sign_pdf(args)
@@ -182,7 +182,7 @@ def save_contract():
 
         else:
             data = request.get_json()
-            pdf_data = f"{main_bp.config['CWD']}/app/static/contracts/{secure_filename(data['filename'])}"
+            pdf_data = f"{current_app.config['CWD']}/app/static/contracts/{secure_filename(data['filename'])}"
 
             conn = get_db()
             cursor = conn.cursor()
@@ -223,7 +223,7 @@ def delete_file():
             files = template["files"]
             [files.remove(x)  for x in files if file_path in x]
             # Example usage
-            folder_path = f"{main_bp.config['CWD']}/app/static/files"
+            folder_path = f"{current_app.config['CWD']}/app/static/files"
             file_names_without_extensions = get_file_names_without_extensions(file_path,folder_path)
 
 
@@ -266,6 +266,6 @@ def uploaded_files():
 
 @main_bp.route('/download/<path:filename>', methods=['GET'])
 def download_file(filename):
-    return send_from_directory(f"{main_bp.config['CWD']}/app/static/", filename, as_attachment=True)
+    return send_from_directory(f"{current_app.config['CWD']}/app/static/", filename, as_attachment=True)
 
 

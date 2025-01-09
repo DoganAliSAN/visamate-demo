@@ -1,4 +1,4 @@
-from flask import Blueprint,session,redirect,url_for,render_template,request,jsonify
+from flask import Blueprint,session,redirect,url_for,render_template,request,jsonify,current_app
 from functions import get_db,UploadFileForm,get_file_names_without_extensions,secure_filename
 import os,json
 customer_bp  = Blueprint('customer', __name__)
@@ -38,7 +38,7 @@ def update_files_customer():
         if keyword not in file.filename:
             return redirect(url_for('main.dashboard'))
         file_name = f"{name}.{file.content_type.split('/')[1]}"
-        file_path = f"{customer_bp.config['CWD']}/app/static/files/" + secure_filename(file_name)
+        file_path = f"{current_app.config['CWD']}/app/static/files/" + secure_filename(file_name)
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../static/files",secure_filename(file_name)))
     else:
         return (redirect(url_for('main.dashboard')),400)
