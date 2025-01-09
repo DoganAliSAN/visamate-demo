@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anasayfa</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="static/css/style.css" />
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="navigator">
+            <div class="navigator-logo">
+            </div>
+            <div class="navigator-links">
+                <a class="nav-button" href="/">Anasayfa</a>
+
+                <a class="nav-button" href="/logout">Çıkış Yap</a>
+                <div class="nav-button">
+                    <form action="" class="filter">
+                        <input type="checkbox" name="inprogress-filter" id="inprogress-filter" checked>
+                        <label for="inprogress-filter">
+                            Yapılacak
+                        </label>
+                        <input type="checkbox" name="done-filter" id="done-filter" checked>
+                        <label for="done-filter">
+                            Yapıldı
+                        </label>
+                    </form>
+                </div>
+                <input type="text" class="searchbar nav-button" id="searchInput" placeholder="Search...">
+            </div>
+        </nav>
+        <div class="templates">
+            <div id="inprogress" class="home-inprogress template">
+    
+                <div class="home-title">
+                    <h1 class="home-heading">
+                        <span>Yapılacak</span>
+                        <br />
+                    </h1>
+                </div>
+                <div id="inprogress-content" class="home-inprogress-content template-content">
+    
+                    {% for template in session["template"] %}
+    
+                    {%if template.get("templateStatus") == 0 %}
+                    {% with 
+                        template=template,
+                        session=session,
+                        json=json,
+                        t_type=t_type,
+                        form=form,
+                        check_files=check_files,
+                        convert_name=convert_name,
+                        enumerate=enumerate,
+                        str=str,
+                        len=len
+                    %}
+                        {% include 'modal.html' %}
+                    {% endwith %}
+                    
+
+                    {%endif%}
+                    {% endfor %}
+    
+
+                </div>
+    
+            </div>
+            <div id="done" class="home-done template">
+    
+                <div class="home-title">
+                    <h1 class="home-heading">
+                        <span>Yapıldı</span>
+                        <br />
+                    </h1>
+                </div>
+                <div id="done-content" class="home-done-content template-content">
+    
+                    {% for template in session["template"] %}
+                    {%if template.get("templateStatus") == 1 %}
+                    {% with 
+                        template=template,
+                        session=session,
+                        json=json,
+                        t_type=t_type,
+                        form=form,
+                        check_files=check_files,
+                        convert_name=convert_name,
+                        enumerate=enumerate,
+                        str=str,
+                        len=len
+                    %}
+                        {% include 'modal.html' %}
+                    {% endwith %}
+                    {%endif%}
+                    {% endfor %}
+    
+                </div>
+    
+            </div>
+        </div>
+
+        <div id="overlay"></div>
+        <script>
+      
+            // Event delegation for opening modal
+            $(document).on("click", '[data-modal-target]', function () {
+                const modal = document.getElementById($(this).data("modalTarget"));
+
+                openModal(modal);
+            });
+
+            // Event delegation for closing modal
+            $('#overlay').on('click', () => {
+                const modals = document.querySelectorAll('.modal.active');
+                modals.forEach(modal => {
+                    closeModal(modal);
+                });
+            });
+
+            // Event delegation for closing modal
+            $(document).on("click", '[data-close-button]', function () {
+                const modal = $(this).closest('.modal')[0];
+                closeModal(modal);
+            });
+
+            // Function to open modal
+            function openModal(modal) {
+                if (modal == null) return;
+                modal.classList.add('active');
+                $('#overlay').addClass('active');
+            }
+
+            // Function to close modal
+            function closeModal(modal) {
+                if (modal == null) return;
+                modal.classList.remove('active');
+                $('#overlay').removeClass('active');
+            }
+
+        </script>
+
+        <script>
+            // Add event listeners to the checkboxes
+        const inprogressFilterCheckbox = document.getElementById('inprogress-filter');
+        const doneFilterCheckbox = document.getElementById('done-filter');
+
+        inprogressFilterCheckbox.addEventListener('change', () => {
+        const homeinprogress = document.querySelector('.home-inprogress');
+        if (!inprogressFilterCheckbox.checked) {
+        homeinprogress.style.display = 'none';
+        } else {
+        homeinprogress.style.display = 'block';
+        }
+        });
+
+        doneFilterCheckbox.addEventListener('change', () => {
+        const homeDone = document.querySelector('.home-done');
+        if (!doneFilterCheckbox.checked) {
+        homeDone.style.display = 'none';
+        } else {
+        homeDone.style.display = 'block';
+        }
+        });
+
+        // Get the search input field
+        const searchInput = document.getElementById('searchInput');
+
+        // Add event listener for input changes
+        searchInput.addEventListener('input', function() {
+        // Get the search query
+        const searchQuery = this.value.trim().toLowerCase();
+
+        // Get the elements to search within
+        const templates = document.querySelectorAll('.templates .draggable-item');
+
+        // Iterate over the elements and hide/show based on search query
+        templates.forEach(template => {
+        const name = template.querySelector('h3').textContent.toLowerCase();
+        if (name.includes(searchQuery)) {
+        template.style.display = 'block'; // Show the element
+        } else {
+        template.style.display = 'none'; // Hide the element
+        }
+        });
+        });
+
+        </script>
+    </div>
+</body>
+
+</html>

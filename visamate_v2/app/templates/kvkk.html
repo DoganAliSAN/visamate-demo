@@ -1,0 +1,46 @@
+
+<div class="input-group kvkk_acceptance">
+    <input type="checkbox" id="kvkk_acceptance" name="kvkk_acceptance" required>
+    <label for="kvkk_acceptance">KVKK'yı kabul ediyorum</label>
+</div>
+<div id="overlay"></div>
+
+<div id="kvkk_popup" class="popup">
+    <div class="popup-content">
+        <span class="close-button" onclick="closePopup()" style="font-size: 2rem;color:white;">&times;</span>
+        <iframe src="{{ url_for('static', filename='cerezlere_dair_aydinlatma_metni.pdf') }}"
+            style="width: 100%; height: 500px;" frameborder="0"></iframe>
+    </div>
+</div>
+
+<script>
+    // Function to display KVKK popup
+    function showPopup() {
+        var popup = document.getElementById("kvkk_popup");
+        popup.style.display = "block";
+        $('#overlay').addClass('active');
+
+    }
+
+    // Function to close KVKK popup
+    function closePopup() {
+        var popup = document.getElementById("kvkk_popup");
+        popup.style.display = "none";
+        $('#overlay').removeClass('active');
+
+    }
+    $('#overlay').on('click', () => {
+        var popup = document.getElementById("kvkk_popup");
+        popup.style.display = "none";
+        $('#overlay').removeClass('active');
+
+    });
+    // Event listener for checkbox
+    document.getElementById("kvkk_acceptance").addEventListener("change", function () {
+        if (this.checked) {
+            showPopup(); // Display popup when checkbox is checked
+        } else {
+            closePopup(); // Close popup when checkbox is unchecked
+        }
+    });
+</script>

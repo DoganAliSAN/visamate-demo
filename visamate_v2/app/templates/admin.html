@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin paneli</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="static/css/style.css" />
+</head>
+
+<body>
+
+    <div class="container">
+        <div id="popup-container" class="popup-container" ></div>
+
+        <nav class="navigator">
+            <div class="navigator-logo">
+            </div>
+            <div class="navigator-links">
+                <a class="nav-button" href="/">Anasayfa</a>
+                <a class="nav-button" href="/addtemplate">Template Ekle</a>
+                <a class="nav-button save_contract" href="/save_contract">Sözleşme Ekle</a>
+                <div class="nav-button">
+                    <form action="" class="filter">
+                        <input type="checkbox" name="todo-filter" id="todo-filter" checked>
+                        <label for="todo-filter">
+                            Yapılacak
+                        </label>
+                        <input type="checkbox" name="inprogress-filter" id="inprogress-filter" checked>
+                        <label for="inprogress-filter">
+                            Yapılıyor
+                        </label>
+                        <input type="checkbox" name="done-filter" id="done-filter" checked>
+                        <label for="done-filter">
+                            Yapıldı
+                        </label>
+                    </form>
+                </div>
+                <input type="text" class="searchbar nav-button" id="searchInput" placeholder="Search...">
+                <a class="nav-button" href="/logout">Çıkış Yap</a>
+            </div>
+        </nav>
+        <div class="templates">
+            <div id="todo" class="home-todo template-admin">
+    
+                <div class="home-title">
+                    <h1 class="home-heading">
+                        <span>Yapılacak</span>
+                        <br />
+                    </h1>
+                </div>
+                <div id="todo-content" class="home-todo-content template-content">
+                    {% for user in users %}
+                    {% for template in json.loads(user[9]) %}
+                    
+                    {%if template.get("templateStatus") == 2 and session["email"] in json.loads(template.get("incharge")) %}
+                    {% with 
+                        template=template,
+                        session=session,
+                        json=json,
+                        t_type=t_type,
+                        form=form,
+                        check_files=check_files,
+                        convert_name=convert_name,
+                        enumerate=enumerate,
+                        str=str,
+                        len=len,
+                        secure_filename=secure_filename
+
+                    %}
+                        {% include 'modal_admin.html' %}
+                    {% endwith %}
+                    {%endif%}
+                    <script>
+
+                        if (typeof count_left_file{{user[1]}}{{user[2][-4:]}}{{template.get("template_id")}} !== 'undefined') {
+                            // Variable is defined
+                            if (count_left_file{{user[1]}}{{user[2][-4:]}}{{template.get("template_id")}} === {{ len(t_type(template.get("templateType")))}} ) {
+                                // Create a container div for the popups
+                                var popupContainer = document.getElementById('popup-container');
+
+                                popupContainer.style.position = 'fixed'; // Ensure the container stays in position
+                                popupContainer.style.right = '20px';
+                                popupContainer.style.height = 'auto';
+                                popupContainer.style.top = '20px';
+                                popupContainer.style.zIndex = '9999';
+
+                                // Create a div element for the popup
+                                var popup = document.createElement('div');
+                                popup.className = 'popup';
+                                popup.textContent = '{{user[0]}} {{user[1]}} {{template.get("templateType")}} Dosyaların Tamamı Yüklendi'; // Customize the message as needed
+
+                                // Style the popup
+                                popup.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                                popup.style.color = 'white';
+                                popup.style.padding = '10px';
+                                popup.style.borderRadius = '5px';
+                                popup.style.marginBottom = '10px'; // Adjust the margin between popups as needed
+
+                                // Append the popup to the container
+                                popupContainer.appendChild(popup);
+
+                                // Append the container to the body
+                                document.body.appendChild(popupContainer);
+
+                                // Set a timeout to hide the popup after a certain period of time (e.g., 5 seconds)
+                                setTimeout(function () {
+                                    popupContainer.remove();
+                                    //popupContainer.style.display = 'none';
+                                }, 5000); // Adjust the time (in milliseconds) as needed
+                            };
+
+
+                            }
+                    </script>
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+                
+            </div>
+            <div id="inprogress" class="home-inprogress template-admin">
+    
+                <div class="home-title">
+                    <h1 class="home-heading">
+                        <span>Yapılıyor</span>
+                        <br />
+                    </h1>
+                </div>
+                <div id="inprogress-content" class="home-inprogress-content template-content">
+                    {% for user in users %}
+                    {% for template in json.loads(user[9]) %}
+                    
+                    {%if template.get("templateStatus") == 0 and session["email"] in json.loads(template.get("incharge")) %}
+                    {% with 
+                        template=template,
+                        session=session,
+                        json=json,
+                        t_type=t_type,
+                        form=form,
+                        check_files=check_files,
+                        convert_name=convert_name,
+                        enumerate=enumerate,
+                        str=str,
+                        len=len,
+                        secure_filename=secure_filename
+                    %}
+                        {% include 'modal_admin.html' %}
+                    {% endwith %}
+                    {%endif%}
+                    <script>
+
+                        if (typeof count_left_file{{user[1]}}{{user[2][-4:]}}{{template.get("template_id")}} !== 'undefined') {
+                            // Variable is defined
+                            if (count_left_file{{user[1]}}{{user[2][-4:]}}{{template.get("template_id")}} === {{ len(t_type(template.get("templateType")))}} ) {
+                                // Create a container div for the popups
+                                var popupContainer = document.getElementById('popup-container');
+
+                                popupContainer.style.position = 'fixed'; // Ensure the container stays in position
+                                popupContainer.style.right = '20px';
+                                popupContainer.style.height = 'auto';
+                                popupContainer.style.top = '20px';
+                                popupContainer.style.zIndex = '9999';
+
+                                // Create a div element for the popup
+                                var popup = document.createElement('div');
+                                popup.className = 'popup';
+                                popup.textContent = '{{user[0]}} {{user[1]}} {{template.get("templateType")}} Dosyaların Tamamı Yüklendi'; // Customize the message as needed
+
+                                // Style the popup
+                                popup.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                                popup.style.color = 'white';
+                                popup.style.padding = '10px';
+                                popup.style.borderRadius = '5px';
+                                popup.style.marginBottom = '10px'; // Adjust the margin between popups as needed
+
+                                // Append the popup to the container
+                                popupContainer.appendChild(popup);
+
+                                // Append the container to the body
+                                document.body.appendChild(popupContainer);
+
+                                // Set a timeout to hide the popup after a certain period of time (e.g., 5 seconds)
+                                setTimeout(function () {
+                                    popupContainer.remove();
+                                    //popupContainer.style.display = 'none';
+                                }, 5000); // Adjust the time (in milliseconds) as needed
+                            };
+
+
+                            }
+                    </script>
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+                
+            </div>
+            <div id="done" class="home-done template-admin">
+
+                <div class="home-title">
+                    <h1 class="home-heading">
+                        <span>Yapıldı</span>
+                        <br />
+                    </h1>
+                </div>
+                <div id="done-content" class="home-done-content template-content">
+                    {% for user in users %}
+                    {% for template in json.loads(user[9]) %}
+                    {%if template.get("templateStatus") == 1 and session["email"] in json.loads(template.get("incharge")) %}
+                    {% with 
+                        template=template,
+                        session=session,
+                        json=json,
+                        t_type=t_type,
+                        form=form,
+                        check_files=check_files,
+                        convert_name=convert_name,
+                        enumerate=enumerate,
+                        str=str,
+                        len=len,
+                        done=True,
+                        users=users,
+                        contracts= contracts
+                    %}
+                        {% include 'modal_admin.html' %}
+                    {% endwith %}
+                    {%endif%}
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="overlay"></div>
+        <script>
+            function changeStatus(tckn, template_id, status) {
+                fetch(`/api/template_status?tckn=${tckn}&template_id=${template_id}&templateStatus=${status}`, {
+                    redirect: 'follow'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    location.reload();
+                })
+                .catch(error => console.error('There was a problem with the fetch operation:', error));
+            }
+
+            const dragItems = document.querySelectorAll(".draggable-item");
+            const dropZones = document.querySelectorAll(".template-admin");
+
+            // Convert dragItems and dropZones NodeList into arrays
+            const dragItemsArray = Array.from(dragItems);
+            const dropZonesArray = Array.from(dropZones);
+
+            let originalDropZoneId = null; // Variable to store the original drop zone ID
+
+            dragItemsArray.forEach(function(dragItem) {
+                dragItem.addEventListener("dragstart", function(event) {
+                    dragItem.classList.add("dragging");
+                    originalDropZoneId = dragItem.closest(".template-admin").id; // Store the ID of the original drop zone
+
+                });
+                dragItem.addEventListener("dragend", function(event) {
+                    dragItem.classList.remove("dragging");
+                    originalDropZoneId = null; // Reset the original drop zone ID
+                });
+            });
+
+            dropZonesArray.forEach(function(dropZone) {
+                dropZone.addEventListener("dragover", function(event) {
+                    event.preventDefault();
+                });
+                dropZone.addEventListener("drop", function(event) {
+                    const draggedItem = document.querySelector(".draggable-item.dragging");
+
+                    dropZone.appendChild(draggedItem);
+                    draggedItem.classList.remove("dragging");
+
+                    var template_id = draggedItem.children[0].getAttribute("data-modal-target").split("-")[1];
+                    var tckn = draggedItem.children[0].getAttribute("data-modal-target").split("-")[0].slice(-4);
+
+                    console.log(draggedItem.children[0].getAttribute("data-modal-target"));
+                    console.log(template_id);
+                    console.log(tckn);
+                    
+                    // Check if the dragged item is dropped in a different drop zone than the original
+                    if (originalDropZoneId !== dropZone.id) {
+                        if (dropZone.id == "todo") {
+                            changeStatus(tckn, template_id, 2);
+                        } else if (dropZone.id == "inprogress") {
+                            changeStatus(tckn, template_id, 0);
+                        } else {
+                            changeStatus(tckn, template_id, 1);
+                        }
+                    }
+                });
+            });
+
+        </script>
+        <script>
+
+            // Event delegation for opening modal
+            $(document).on("click", '[data-modal-target]', function () {
+                const modal = document.getElementById($(this).data("modalTarget"));
+
+                openModal(modal);
+            });
+
+            // Event delegation for closing modal
+            $('#overlay').on('click', () => {
+                const modals = document.querySelectorAll('.modal.active');
+                modals.forEach(modal => {
+                    closeModal(modal);
+                });
+            });
+
+            // Event delegation for closing modal
+            $(document).on("click", '[data-close-button]', function () {
+                const modal = $(this).closest('.modal')[0];
+                closeModal(modal);
+            });
+
+            // Function to open modal
+            function openModal(modal) {
+                if (modal == null) return;
+                modal.classList.add('active');
+                $('#overlay').addClass('active');
+            }
+
+            // Function to close modal
+            function closeModal(modal) {
+                if (modal == null) return;
+                modal.classList.remove('active');
+                $('#overlay').removeClass('active');
+            }
+            function handleChange(selectedValue, tckn, template_id) {
+
+                if (selectedValue) {
+
+                    $.ajax('/api/change_templatetype', {
+                        method: 'GET', // or 'GET' depending on your needs
+
+                        data: {
+                            "templateType": selectedValue,
+                            "tckn": tckn,
+                            "template_id": template_id,
+                        },
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            location.reload(true);
+                            // Handle the response as needed
+                            console.log('Request sent successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+            }
+            function editProperties(template_id) {
+                let element = document.getElementById('settings' + template_id);
+                if (element.style.display == "flex") {
+                    element.style.display = "none";
+                } else {
+                    element.style.display = "flex"
+                }
+            }
+        </script>
+        <script>
+                                    // Add event listeners to the checkboxes
+            const todoFilterCheckbox = document.getElementById('todo-filter');
+            const inprogressFilterCheckbox = document.getElementById('inprogress-filter');
+            const doneFilterCheckbox = document.getElementById('done-filter');
+
+            todoFilterCheckbox.addEventListener('change', () => {
+                const homeTodo = document.querySelector('.home-todo');
+                if (!todoFilterCheckbox.checked) {
+                    homeTodo.style.display = 'none';
+                } else {
+                    homeTodo.style.display = 'block';
+                }
+            });
+
+            inprogressFilterCheckbox.addEventListener('change', () => {
+                const homeInprogress = document.querySelector('.home-inprogress');
+                if (!inprogressFilterCheckbox.checked) {
+                    homeInprogress.style.display = 'none';
+                } else {
+                    homeInprogress.style.display = 'block';
+                }
+            });
+            doneFilterCheckbox.addEventListener('change', () => {
+                const homeDone = document.querySelector('.home-done');
+                if (!doneFilterCheckbox.checked) {
+                    homeDone.style.display = 'none';
+                } else {
+                    homeDone.style.display = 'block';
+                }
+            });
+
+            // Get the search input field
+            const searchInput = document.getElementById('searchInput');
+
+            // Add event listener for input changes
+            searchInput.addEventListener('input', function() {
+                // Get the search query
+                const searchQuery = this.value.trim().toLowerCase();
+
+                // Get the elements to search within
+                const templates = document.querySelectorAll('.templates .draggable-item');
+
+                // Iterate over the elements and hide/show based on search query
+                templates.forEach(template => {
+                    const name = template.querySelector('h4').textContent.toLowerCase();
+                    if (name.includes(searchQuery)) {
+                        template.style.display = 'block'; // Show the element
+                    } else {
+                        template.style.display = 'none'; // Hide the element
+                    }
+                });
+            });
+
+        </script>
+    </div>
+</body>
+
+</html>
+
+
