@@ -112,7 +112,7 @@ def save_signature():
     try:
         data = request.get_json()
         signature_data = data.get('signature')
-        filename = f"app/static/files/signature{secure_filename(data.get('filename'))}.png"
+        filename = f"{current_app.config['CWD']}/app/static/files/signature{secure_filename(data.get('filename'))}.png"
         contract = data.get('contract')
         logging.info("Contract: {}".format(contract))
         tckn = data.get('tckn')
