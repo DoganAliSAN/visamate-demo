@@ -16,8 +16,9 @@ def superadmin():
         form = UploadFileForm()
         users = get_users(get_db(),get_db().cursor())
         identifier= request.args.get("identifier")
-
-        return render_template("superadmin.html",
+        #! Süper admin özelliği müşteri isteği üzerine kapatılmıştır bu sebeple süper adminler
+        #! admin sayfasına yönlendirilecektir
+        return render_template("admin.html",
         session=session,
         users=users,json=json,t_type= t_types,
         form=form,check_files=check_files,

@@ -68,36 +68,53 @@
                 </div>
             </div>
             <!-- SuperAdmin -->
+            <!-- SüperAdmin özelliği kaldırılmıştır.-->
+            <!-- 
+                {% if done %}
+                {% if template.get("superadmin_sign") == 1 %}
+                    <h4 style="color:var(--dl-repeating-color);">Süper admin Sözleşmeyi İmzaladı</h4>
+                {%else%}
+                    <div class="contract-sent">
+                        {% if len(template.get("superadmin")) != 0 %}
+                        <h4>Süper Admine <span style="color:red;">Gönderildi</span></h4>
+                        {%else%}
+                        <h4>Süper Admine gönder</h4>
+                        {%endif%}
+                        <form method="POST" action="/api/superadmin_contract?tckn={{tckn}}&template_id={{template_id}}&identifier={{identifier_modal}}" enctype="multipart/form-data">
+
+                            <select name="contract" id="contracts">
+                                {%for contract in contracts%}
+                                <option  value="{{contract[0]}}">{{contract[1]}}</option>
+                                {%endfor%}
+
+                            </select>
+                            <select name="superadmin" id="selectsuperadmin">
+                                {%for user in users%}
+                                {%if user[7] == "SuperAdmin"%}
+                                <option value="{{user[3]}}">{{user[3]}}</option>
+                                {%endif%}
+                                {%endfor%}
+                            </select>
+
+                            <button class="update-button button">Dosyayı Gönder</button>
+                        </form>
+                    </div>
+                {%endif%}
+                {% endif %}
+            -->
+            <!-- Action on Done -->
             {% if done %}
-            {% if template.get("superadmin_sign") == 1 %}
-                <h4 style="color:var(--dl-repeating-color);">Süper admin Sözleşmeyi İmzaladı</h4>
-            {%else%}
-                <div class="contract-sent">
-                    {% if len(template.get("superadmin")) != 0 %}
-                    <h4>Süper Admine <span style="color:red;">Gönderildi</span></h4>
-                    {%else%}
-                    <h4>Süper Admine gönder</h4>
-                    {%endif%}
-                    <form method="POST" action="/api/superadmin_contract?tckn={{tckn}}&template_id={{template_id}}&identifier={{identifier_modal}}" enctype="multipart/form-data">
-
-                        <select name="contract" id="contracts">
-                            {%for contract in contracts%}
-                            <option  value="{{contract[0]}}">{{contract[1]}}</option>
-                            {%endfor%}
-
-                        </select>
-                        <select name="superadmin" id="selectsuperadmin">
-                            {%for user in users%}
-                            {%if user[7] == "SuperAdmin"%}
-                            <option value="{{user[3]}}">{{user[3]}}</option>
-                            {%endif%}
-                            {%endfor%}
-                        </select>
-
-                        <button class="update-button button">Dosyayı Gönder</button>
-                    </form>
-                </div>
-            {%endif%}
+                <script>
+                    // Ask User if they are sure to mark as done with a alert and move template to done 
+                    function markAsDone() {
+                        if (confirm("Sözleşmeyi tamamlamak istediğinizden emin misiniz?")) {
+                            // If user is sure, move template to done
+                            window.location.href = "/api/mark_as_done?tckn={{tckn}}&template_id={{template_id}}&identifier={{identifier_modal}}";
+                        }
+                    }
+                    document.getElementById("mark-as-done").addEventListener("click", markAsDone);
+                    
+                </script>
             {% endif %}
             <!-- Staff -->
             <div class="included-staff">
