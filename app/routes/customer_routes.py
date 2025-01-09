@@ -38,7 +38,7 @@ def update_files_customer():
         if keyword not in file.filename:
             return redirect(url_for('main.dashboard'))
         file_name = f"{name}.{file.content_type.split('/')[1]}"
-        file_path = "app/static/files/" + secure_filename(file_name)
+        file_path = f"{app.config["CWD"]}/app/static/files/" + secure_filename(file_name)
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),"../static/files",secure_filename(file_name)))
     else:
         return (redirect(url_for('main.dashboard')),400)
